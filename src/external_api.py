@@ -1,3 +1,5 @@
+import json
+import os
 from typing import Dict, List
 
 import requests
@@ -8,6 +10,8 @@ from src.logger_config import add_logger
 
 # Настройка логирования
 logger = add_logger("e_api.log", "e_api")
+
+path_project = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class HeadHunterAPI(VacancyAPI):
@@ -35,25 +39,40 @@ class HeadHunterAPI(VacancyAPI):
 
         :return: Список словарей с краткой информацией.
         """
-        logger.info("Запущен метод для получения информации о работодателях.")
+        logger.info("Запущен метод 'get_employers' для получения информации о работодателях.")
         try:
             self._connect()
         except requests.exceptions.RequestException:
-            logger.error("Прекращена работа метода get_employers из-за ошибки подключения.")
+            logger.error("Прекращена работа метода 'get_employers' из-за ошибки подключения.")
             return []
 
-        employer_names = [
-            "Сбер для экспертов",
-            "Яндекс",
-            "VK",
-            "Ozon",
-            "Ланит",
-            "Лаборатория Касперского",
-            "МедРокет",
-            "X5 Tech",
-            "Тензор",
-            "Альфа-Банк",
-        ]
+        # Определение путей
+        settings_path = os.path.join(path_project, "user_settings.json")
+
+        # Загрузка пользовательских настроек
+        try:
+            with open(settings_path, encoding="UTF-8") as file:
+                user_settings = json.load(file)
+            logger.info("Файл 'user_settings.json' успешно загружен.")
+        except FileNotFoundError:
+            logger.warning("Файл 'user_settings.json' не найден. Используются настройки по умолчанию.")
+            user_settings = {
+                "user_employers": [
+                    "Сбер для экспертов",
+                    "Яндекс",
+                    "VK",
+                    "Ozon",
+                    "Ланит",
+                    "Лаборатория Касперского",
+                    "МедРокет",
+                    "X5 Tech",
+                    "Тензор",
+                    "Альфа-Банк",
+                ]
+            }
+
+        employer_names = user_settings.get("user_employers", [])
+
         employers = []
 
         for name in tqdm(employer_names, desc="Получение данных о работодателях", colour="#19ff19"):
@@ -81,7 +100,7 @@ class HeadHunterAPI(VacancyAPI):
         :param employer_id: Идентификатор работодателя
         :return: Список словарей с вакансиями
         """
-        logger.info(f"Запущен метод для получения вакансий работодателя '{employer_id}'.")
+        logger.info(f"Запущен метод 'get_vacancies' для получения вакансий работодателя '{employer_id}'.")
         vacancies = []
         params = {"employer_id": employer_id, "page": 0, "per_page": 100}
 
