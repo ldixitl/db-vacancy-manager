@@ -54,7 +54,7 @@ class Employer:
 class Vacancy:
     """Класс для представления вакансии."""
 
-    __slots__ = ("__vac_id", "__title", "__salary_from", "__salary_to", "__city", "__employer_name", "__url")
+    __slots__ = ("__vac_id", "__title", "__salary_from", "__salary_to", "__emp_id", "__city", "__url")
 
     def __init__(
         self,
@@ -62,7 +62,7 @@ class Vacancy:
         title: str,
         salary_from: Union[int, None],
         salary_to: Union[int, None],
-        employer_name: str,
+        emp_id: int,
         city: str,
         url: str,
     ) -> None:
@@ -73,16 +73,16 @@ class Vacancy:
         :param title: Название вакансии.
         :param salary_from: Нижняя граница зарплаты.
         :param salary_to: Верхняя граница зарплаты.
+        :param emp_id: ID компании.
         :param city: Город.
-        :param employer_name: Название компании.
         :param url: Ссылка на вакансию.
         """
         self.__vac_id = vac_id if vac_id is not None else -1
         self.__title = title.strip() if title else "Без названия"
         self.__salary_from = salary_from if salary_from is not None else 0
         self.__salary_to = salary_to if salary_to is not None else 0
+        self.__emp_id = emp_id if emp_id is not None else -1
         self.__city = city.strip() if city else "Город не указан"
-        self.__employer_name = employer_name.strip()
         self.__url = url.strip() if url else "Ссылка не указана"
         logger.info(f"Создан объект класса Vacancy для вакансии - {self.__title} (ID:{self.__vac_id}).")
 
@@ -100,7 +100,7 @@ class Vacancy:
         elif self.__salary_to:
             salary_text = f"до {self.__salary_to} ₽"
 
-        return f"{self.__title} | {self.__employer_name} | {self.__city} | {salary_text} | {self.__url}"
+        return f"{self.__title} | ID работодателя: {self.__emp_id} | {self.__city} | {salary_text} | {self.__url}"
 
     @property
     def vac_id(self) -> int:
@@ -123,14 +123,14 @@ class Vacancy:
         return self.__salary_to
 
     @property
+    def emp_id(self) -> int:
+        """Геттер для получения идентификатора вакансии."""
+        return self.__emp_id
+
+    @property
     def city(self) -> str:
         """Геттер для получения города вакансии."""
         return self.__city
-
-    @property
-    def employer_name(self) -> str:
-        """Геттер для получения компании вакансии."""
-        return self.__employer_name
 
     @property
     def url(self) -> str:
