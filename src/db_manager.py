@@ -116,9 +116,11 @@ class DBManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     """
-                    SELECT name, vac_count
-                    FROM employers
-                    ORDER BY vac_count DESC;
+                    SELECT e.name, COUNT(v.vac_id) as vacancy_count 
+                    FROM employers e
+                    LEFT JOIN vacancies v USING (emp_id)
+                    GROUP BY e.name
+                    ORDER BY vacancy_count;
                     """
                 )
                 employers = cur.fetchall()
